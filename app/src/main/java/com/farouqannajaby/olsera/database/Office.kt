@@ -28,4 +28,10 @@ class Office : Parcelable {
 
     @ColumnInfo(name = "status")
     var status: String? = null
+
+    @ColumnInfo(name = "longtitude")
+    var longtitude: String? = null
+
+    @ColumnInfo(name = "latitude")
+    var latitude: String? = null
 }
