@@ -21,7 +21,7 @@ class Office : Parcelable {
     var city: String? = null
 
     @ColumnInfo(name = "zipcode")
-    var zipcode: Int = 0
+    var zipcode: String? = null
 
     @ColumnInfo(name = "alamat")
     var alamat: String? = null

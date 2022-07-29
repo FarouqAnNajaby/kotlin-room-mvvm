@@ -4,11 +4,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.StringRes
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.farouqannajaby.olsera.R
 import com.farouqannajaby.olsera.databinding.ActivityHomeBinding
 import com.farouqannajaby.olsera.databinding.ActivityMainBinding
+import com.farouqannajaby.olsera.helper.ViewModelFactory
+import com.farouqannajaby.olsera.ui.home.adapter.OfficeAdapter
 import com.farouqannajaby.olsera.ui.home.adapter.SectionPagerAdapter
 import com.farouqannajaby.olsera.ui.home.insert.AddUpdateOfficeActivity
+import com.farouqannajaby.olsera.ui.home.insert.OfficeAddUpdateViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeActivity : AppCompatActivity() {
@@ -40,10 +45,12 @@ class HomeActivity : AppCompatActivity() {
             toAddEdit()
         }
 
+
     }
 
     private fun toAddEdit(){
         val intent = Intent(this@HomeActivity, AddUpdateOfficeActivity::class.java)
         startActivity(intent)
     }
+
 }

@@ -1,6 +1,7 @@
 package com.farouqannajaby.olsera.ui.map
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.farouqannajaby.olsera.R
 import com.farouqannajaby.olsera.databinding.ActivityMapsBinding
+import com.farouqannajaby.olsera.ui.home.insert.AddUpdateOfficeActivity
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -26,6 +28,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private var lat : String = ""
+    private var long : String = ""
+    private var address : String = ""
+    private val TAG = "MapsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +64,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     .title("New Marker")
                     .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+
             )
+            lat = latLng.latitude.toString()
+            long = latLng.longitude.toString()
         }
 
         googleMap.setOnMapClickListener { point ->
@@ -108,6 +117,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return addressName
     }
 
+    private fun getCity(lat: Double, lon: Double): String? {
+        var city: String? = null
+        val geocoder = Geocoder(this@MapsActivity, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                city = list[0].subAdminArea
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return city
+    }
+
+    private fun getPostalCode(lat: Double, lon: Double): String? {
+        var postal: String? = null
+        val geocoder = Geocoder(this@MapsActivity, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                postal = list[0].postalCode
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return postal
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         return super.onCreateOptionsMenu(menu)
     }
@@ -115,6 +152,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             onBackPressed()
+            val intent = Intent(this@MapsActivity, AddUpdateOfficeActivity::class.java)
+            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LATITUDE, lat)
+            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LONGTITUDE, long)
+            intent.putExtra(AddUpdateOfficeActivity.EXTRA_ADDRESS,
+                getAddressName(lat.toDouble(),long.toDouble()))
+            intent.putExtra(AddUpdateOfficeActivity.EXTRA_CITY,
+                getCity(lat.toDouble(),long.toDouble()))
+            intent.putExtra(AddUpdateOfficeActivity.EXTRA_POSTAL,
+                getPostalCode(lat.toDouble(),long.toDouble()))
+            startActivity(intent)
         }
         return super.onOptionsItemSelected(item)
     }
