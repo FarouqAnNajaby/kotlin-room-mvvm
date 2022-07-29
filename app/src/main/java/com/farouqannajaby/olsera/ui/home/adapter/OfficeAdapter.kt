@@ -1,7 +1,9 @@
 package com.farouqannajaby.olsera.ui.home.adapter
 
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -41,8 +43,15 @@ class OfficeAdapter : RecyclerView.Adapter<OfficeAdapter.OfficeViewHolder>() {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(office: Office) {
             with(binding) {
-                tvNameAndCity.text = office.title
-                tvActive.text = office.status
+                if (position % 2 == 0){
+                    containerItem.setBackgroundColor(Color.GRAY)
+                }
+                tvNameAndCity.text = office.title + office.city
+                if (office.status.equals("1")){
+                    tvStatus.visibility = View.GONE
+                }else{
+                    tvActive.visibility = View.GONE
+                }
                 binding.btnArrow.setOnClickListener {
                     val intent = Intent(it.context, AddUpdateOfficeActivity::class.java)
                     intent.putExtra(AddUpdateOfficeActivity.EXTRA_OFFICE, office)

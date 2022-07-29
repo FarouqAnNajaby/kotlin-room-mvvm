@@ -57,10 +57,6 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         binding.etCity.setText(intent.getStringExtra(EXTRA_CITY).toString())
         binding.etKode.setText(intent.getStringExtra(EXTRA_POSTAL).toString())
 
-        showToast(long)
-        showToast(lat)
-        showToast(binding.etAlamat.text.toString())
-
         if (office!= null){
             isEdit = true
         }
@@ -92,11 +88,6 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
             supportActionBar?.title = actionBarTitle
 
             binding.btnsave.text = btnTitle
-
-            binding.btnCancel.setOnClickListener{
-                val intent = Intent(this@AddUpdateOfficeActivity, HomeActivity::class.java)
-                startActivity(intent)
-            }
 
             binding.btnsave.setOnClickListener {
                 val title = binding.etNama.text.toString().trim()
@@ -133,17 +124,71 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
                             office?.longtitude = long
                             office?.status = status
                         }
-                        if (isEdit) {
-                            officeAddUpdateViewModel.update(office as Office)
-                            showToast(getString(R.string.changed))
-                        }else{
-                            officeAddUpdateViewModel.insert(office as Office)
-                            showToast(getString(R.string.added))
-                        }
+
+                        officeAddUpdateViewModel.update(office as Office)
+                        showToast(getString(R.string.changed))
+                        val intent = Intent(this@AddUpdateOfficeActivity,
+                            HomeActivity::class.java)
+                        startActivity(intent)
                         finish()
                     }
                 }
             }
+
+        }else{
+
+            binding.btnsave.setOnClickListener {
+                val title = binding.etNama.text.toString().trim()
+                val city = binding.etCity.text.toString().trim()
+                val alamat = binding.etAlamat.text.toString().trim()
+                val kode = binding.etKode.text.toString().trim()
+                showToast("Kliked")
+                when {
+                    title.isEmpty() -> {
+                        binding.etNama.error = getString(R.string.text_empty)
+                    }
+                    city.isEmpty() -> {
+                        binding.etCity.error = getString(R.string.text_empty)
+                    }
+                    alamat.isEmpty() -> {
+                        binding.etAlamat.error = getString(R.string.text_empty)
+                    }
+                    kode.isEmpty() -> {
+                        binding.etKode.error = getString(R.string.text_empty)
+                    }
+                    lat.isEmpty() -> {
+                        showToast(getString(R.string.empty_latitude))
+                    }
+                    long.isEmpty() -> {
+                        showToast(getString(R.string.longtitude_empty))
+                    }
+                    else -> {
+                        office.let { office ->
+                            office?.title = title
+                            office?.city = city
+                            office?.alamat = alamat
+                            office?.zipcode = kode
+                            office?.latitude = lat
+                            office?.longtitude = long
+                            office?.status = status
+                        }
+
+                        officeAddUpdateViewModel.insert(office as Office)
+                        showToast(getString(R.string.added))
+
+                        val intent = Intent(this@AddUpdateOfficeActivity,
+                            HomeActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            }
+        }
+
+        binding.btnCancel.setOnClickListener{
+            val intent = Intent(this@AddUpdateOfficeActivity, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
         binding.btnMaps.setOnClickListener{
@@ -163,13 +208,13 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.action_delete -> showAlertDialog(ALERT_DIALOG_DELETE)
-//            android.R.id.home -> showAlertDialog(ALERT_DIALOG_CLOSE)
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_delete -> showAlertDialog(ALERT_DIALOG_DELETE)
+            android.R.id.home -> showAlertDialog(ALERT_DIALOG_CLOSE)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     private fun obtainViewModel(activity: AppCompatActivity): OfficeAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
@@ -205,9 +250,9 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
-//    override fun onBackPressed() {
-//        showAlertDialog(ALERT_DIALOG_CLOSE)
-//    }
+    override fun onBackPressed() {
+        showAlertDialog(ALERT_DIALOG_CLOSE)
+    }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
