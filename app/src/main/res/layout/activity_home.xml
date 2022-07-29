@@ -18,10 +18,13 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
+            app:tabIndicatorColor="@color/purple_500"
+            app:tabBackground="@drawable/tab_selector"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:tabTextColor="@android:color/white"/>
+            android:background="@drawable/tab_layout_bg"
+            app:tabSelectedTextColor="@color/purple_500"
+            app:tabTextColor="@color/white"/>
 
     </androidx.cardview.widget.CardView>
 

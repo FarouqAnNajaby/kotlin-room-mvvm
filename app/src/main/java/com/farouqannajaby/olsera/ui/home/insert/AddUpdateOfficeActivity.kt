@@ -15,6 +15,7 @@ import com.farouqannajaby.olsera.R
 import com.farouqannajaby.olsera.database.Office
 import com.farouqannajaby.olsera.databinding.ActivityAddUpdateOfficeBinding
 import com.farouqannajaby.olsera.helper.ViewModelFactory
+import com.farouqannajaby.olsera.ui.home.HomeActivity
 import com.farouqannajaby.olsera.ui.map.MapsActivity
 
 class AddUpdateOfficeActivity : AppCompatActivity() {
@@ -92,13 +93,17 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
 
             binding.btnsave.text = btnTitle
 
+            binding.btnCancel.setOnClickListener{
+                val intent = Intent(this@AddUpdateOfficeActivity, HomeActivity::class.java)
+                startActivity(intent)
+            }
+
             binding.btnsave.setOnClickListener {
                 val title = binding.etNama.text.toString().trim()
                 val city = binding.etCity.text.toString().trim()
                 val alamat = binding.etAlamat.text.toString().trim()
                 val kode = binding.etKode.text.toString().trim()
-
-
+                showToast("Kliked")
                 when {
                     title.isEmpty() -> {
                         binding.etNama.error = getString(R.string.text_empty)
@@ -158,13 +163,13 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_delete -> showAlertDialog(ALERT_DIALOG_DELETE)
-            android.R.id.home -> showAlertDialog(ALERT_DIALOG_CLOSE)
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.action_delete -> showAlertDialog(ALERT_DIALOG_DELETE)
+//            android.R.id.home -> showAlertDialog(ALERT_DIALOG_CLOSE)
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     private fun obtainViewModel(activity: AppCompatActivity): OfficeAddUpdateViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
@@ -200,9 +205,9 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
-    override fun onBackPressed() {
-        showAlertDialog(ALERT_DIALOG_CLOSE)
-    }
+//    override fun onBackPressed() {
+//        showAlertDialog(ALERT_DIALOG_CLOSE)
+//    }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
