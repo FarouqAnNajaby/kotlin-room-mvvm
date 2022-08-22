@@ -8,30 +8,30 @@ import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "office")
 @Parcelize
-class Office : Parcelable {
+data class Office(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    var id: Int = 0
+    var id: Int = 0,
 
     @ColumnInfo(name = "title")
-    var title: String? = null
+    var title: String? = null,
 
     @ColumnInfo(name = "city")
-    var city: String? = null
+    var city: String? = null,
 
     @ColumnInfo(name = "zipcode")
-    var zipcode: String? = null
+    var zipcode: String? = null,
 
     @ColumnInfo(name = "alamat")
-    var alamat: String? = null
+    var alamat: String? = null,
 
     @ColumnInfo(name = "status")
-    var status: String? = null
+    var status: String? = null,
 
     @ColumnInfo(name = "longtitude")
-    var longtitude: String? = null
+    var longtitude: String? = null,
 
     @ColumnInfo(name = "latitude")
     var latitude: String? = null
-}
+): Parcelable

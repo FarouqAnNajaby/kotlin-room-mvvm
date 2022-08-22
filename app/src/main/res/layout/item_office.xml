@@ -36,12 +36,15 @@
 
     <TextView
         android:id="@+id/tv_name_and_city"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/card_img"
+        app:layout_constraintEnd_toStartOf="@+id/tvStatus"
         app:layout_constraintTop_toTopOf="@id/card_img"
         android:layout_marginTop="20dp"
         tools:text="Olsera - Jogja"
+        android:layout_marginEnd="20dp"
+        android:maxLines="3"
         android:textStyle="bold"
         android:layout_marginStart="10dp"/>
 
