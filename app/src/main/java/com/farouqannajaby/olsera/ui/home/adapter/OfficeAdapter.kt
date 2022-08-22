@@ -47,7 +47,7 @@ class OfficeAdapter : RecyclerView.Adapter<OfficeAdapter.OfficeViewHolder>() {
                 if (position % 2 == 0){
                     containerItem.setBackgroundColor(Color.GRAY)
                 }
-                val nameCity = office.title+" "+office.city
+                val nameCity = office.latitude+" "+office.city
                 tvNameAndCity.text = nameCity
                 if (office.status.equals("1")){
                     tvStatus.visibility = View.GONE

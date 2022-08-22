@@ -25,7 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
-class AddUpdateOfficeActivity : AppCompatActivity() {
+class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityAddUpdateOfficeBinding
 
@@ -60,16 +60,16 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         binding = ActivityAddUpdateOfficeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        val mapFragment = supportFragmentManager
-//            .findFragmentById(R.id.map) as SupportMapFragment
-//        mapFragment.getMapAsync(this)
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         officeAddUpdateViewModel = obtainViewModel(this@AddUpdateOfficeActivity)
 
-        office =  intent.getParcelableExtra<Office>(EXTRA_OFFICE) as Office
+        office =  intent.getParcelableExtra(EXTRA_OFFICE)
 
-//        lat = intent.getStringExtra(EXTRA_LATITUDE).toString()
-//        long = intent.getStringExtra(EXTRA_LONGTITUDE).toString()
+        lat = intent.getStringExtra(EXTRA_LATITUDE) ?: "0"
+        long = intent.getStringExtra(EXTRA_LONGTITUDE) ?: "0"
         city = intent.getStringExtra(EXTRA_CITY) ?: ""
         title = intent.getStringExtra(EXTRA_TITLE) ?: ""
         alamat = intent.getStringExtra(EXTRA_ADDRESS) ?: ""
@@ -99,15 +99,6 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
 //                    long = office.longtitude.toString()
                 }
             }
-            else{
-                actionBarTitle = getString(R.string.title_add_office)
-                btnTitle = getString(R.string.title_add_office)
-            }
-
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = actionBarTitle
-
-            binding.btnsave.text = btnTitle
 
             binding.btnsave.setOnClickListener {
                 val title = binding.etNama.text.toString().trim()
@@ -154,7 +145,16 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
                 }
             }
 
-        }else{
+        }
+        else{
+            actionBarTitle = getString(R.string.title_add_office)
+            btnTitle = getString(R.string.title_add_office)
+
+            binding.etNama.setText(title)
+            binding.etAlamat.setText(alamat)
+            binding.etKode.setText(codePos)
+            binding.etCity.setText(city)
+
             binding.btnsave.setOnClickListener {
                 val title = binding.etNama.text.toString().trim()
                 val city = binding.etCity.text.toString().trim()
@@ -201,6 +201,11 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
                 }
             }
         }
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = actionBarTitle
+
+        binding.btnsave.text = btnTitle
 
         binding.btnCancel.setOnClickListener{
             val intent = Intent(this@AddUpdateOfficeActivity, HomeActivity::class.java)
@@ -291,71 +296,71 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onMapReady(googleMap: GoogleMap) {
-//        mMap = googleMap
-//
-//        mMap.uiSettings.isZoomControlsEnabled = true
-//        mMap.uiSettings.isIndoorLevelPickerEnabled = true
-//        mMap.uiSettings.isCompassEnabled = true
-//        mMap.uiSettings.isMapToolbarEnabled = true
-//
-//        mMap.setOnMapLongClickListener { latLng ->
-//            mMap.addMarker(
-//                MarkerOptions()
-//                    .position(latLng)
-//                    .title("Lokasi Anda")
-//                    .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
-//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-//
-//            )
-//            lat = latLng.latitude.toString()
-//            long = latLng.longitude.toString()
-//        }
-//
-//        googleMap.setOnMapClickListener { point ->
-//            Toast.makeText(
-//                this,
-//                point.latitude.toString() + ", " + point.longitude,
-//                Toast.LENGTH_SHORT
-//            ).show()
-//        }
-//
-//
-//        mLoadMaps()
-//
-//    }
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
 
-//    private fun mLoadMaps() {
-//        val height: Int = SIZE_MARKER
-//        val width: Int = SIZE_MARKER
-//        val bitmapdraw = resources.getDrawable(R.drawable.img_location) as BitmapDrawable
-//        val b = bitmapdraw.bitmap
-//        val smallMarker = Bitmap.createScaledBitmap(
-//            b,
-//            bitmapdraw.bitmap.width * width / 100,
-//            bitmapdraw.bitmap.height * height / 100,
-//            false
-//        )
-//        mMap.addMarker(
-//            MarkerOptions()
-//                .position(LatLng(lat.toDouble(), long.toDouble()))
-//                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-//                .title("Lokasi Anda")
-//        )
-//
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat.toDouble(), long.toDouble()), 10f))
-//        val cameraPosition = CameraPosition.Builder()
-//            .target(LatLng(lat.toDouble(), long.toDouble())) // Sets the center of the map to location user
-//            .zoom(16f) // Sets the zoom
-//            .bearing(0f) // Sets the orientation of the camera to east
-//            .tilt(0f) // Sets the tilt of the camera to 30 degrees
-//            .build() // Creates a CameraPosition from the builder
-//        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-//        val circle = mMap.addCircle(
-//            CircleOptions()
-//                .center(LatLng(lat.toDouble(), long.toDouble()))
-//                .radius(60.0)
-//                .strokeWidth(3f)
-//        )
-//    }
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isIndoorLevelPickerEnabled = true
+        mMap.uiSettings.isCompassEnabled = true
+        mMap.uiSettings.isMapToolbarEnabled = true
+
+        mMap.setOnMapLongClickListener { latLng ->
+            mMap.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+                    .title("Lokasi Anda")
+                    .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+
+            )
+            lat = latLng.latitude.toString()
+            long = latLng.longitude.toString()
+        }
+
+        googleMap.setOnMapClickListener { point ->
+            Toast.makeText(
+                this,
+                point.latitude.toString() + ", " + point.longitude,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
+        mLoadMaps()
+
+    }
+
+    private fun mLoadMaps() {
+        val height: Int = SIZE_MARKER
+        val width: Int = SIZE_MARKER
+        val bitmapdraw = resources.getDrawable(R.drawable.img_location) as BitmapDrawable
+        val b = bitmapdraw.bitmap
+        val smallMarker = Bitmap.createScaledBitmap(
+            b,
+            bitmapdraw.bitmap.width * width / 100,
+            bitmapdraw.bitmap.height * height / 100,
+            false
+        )
+        mMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(lat.toDouble(), long.toDouble()))
+                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+                .title("Lokasi Anda")
+        )
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat.toDouble(), long.toDouble()), 10f))
+        val cameraPosition = CameraPosition.Builder()
+            .target(LatLng(lat.toDouble(), long.toDouble())) // Sets the center of the map to location user
+            .zoom(16f) // Sets the zoom
+            .bearing(0f) // Sets the orientation of the camera to east
+            .tilt(0f) // Sets the tilt of the camera to 30 degrees
+            .build() // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+        val circle = mMap.addCircle(
+            CircleOptions()
+                .center(LatLng(lat.toDouble(), long.toDouble()))
+                .radius(60.0)
+                .strokeWidth(3f)
+        )
+    }
 }
