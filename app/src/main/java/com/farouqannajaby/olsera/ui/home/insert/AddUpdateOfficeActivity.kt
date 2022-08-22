@@ -39,6 +39,9 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
     private var office: Office? = null
     private var lat : String = ""
     private var long : String = ""
+    private var city : String? = null
+    private var alamat: String? = null
+    private var codePos: String? = null
     private lateinit var officeAddUpdateViewModel: OfficeAddUpdateViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,12 +53,16 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
 
         office = intent.getParcelableExtra(EXTRA_OFFICE)
 
-        lat = intent.getStringExtra(EXTRA_LATITUDE).toString()
-        long = intent.getStringExtra(EXTRA_LONGTITUDE).toString()
-
-        binding.etAlamat.setText(intent.getStringExtra(EXTRA_ADDRESS).toString())
-        binding.etCity.setText(intent.getStringExtra(EXTRA_CITY).toString())
-        binding.etKode.setText(intent.getStringExtra(EXTRA_POSTAL).toString())
+//        lat = intent.getStringExtra(EXTRA_LATITUDE).toString()
+//        long = intent.getStringExtra(EXTRA_LONGTITUDE).toString()
+//
+//        city = intent.getStringExtra(EXTRA_CITY) ?: ""
+//        alamat = intent.getStringExtra(EXTRA_ADDRESS) ?: ""
+//        codePos = intent.getStringExtra(EXTRA_POSTAL) ?: ""
+//
+//        binding.etAlamat.setText(alamat)
+//        binding.etCity.setText(city)
+//        binding.etKode.setText(codePos)
 
         if (office!= null){
             isEdit = true
@@ -73,6 +80,7 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
             if (office != null){
                 office?.let { office ->
                     binding.etNama.setText(office.title)
+                    Log.i(TAG, "cek "+office.alamat)
                     binding.etAlamat.setText(office.alamat)
                     binding.etKode.setText(office.zipcode)
                     binding.etCity.setText(office.city)
@@ -94,7 +102,6 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
                 val city = binding.etCity.text.toString().trim()
                 val alamat = binding.etAlamat.text.toString().trim()
                 val kode = binding.etKode.text.toString().trim()
-                showToast("Kliked")
                 when {
                     title.isEmpty() -> {
                         binding.etNama.error = getString(R.string.text_empty)
@@ -136,13 +143,11 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
             }
 
         }else{
-
             binding.btnsave.setOnClickListener {
                 val title = binding.etNama.text.toString().trim()
                 val city = binding.etCity.text.toString().trim()
                 val alamat = binding.etAlamat.text.toString().trim()
                 val kode = binding.etKode.text.toString().trim()
-                showToast("Kliked")
                 when {
                     title.isEmpty() -> {
                         binding.etNama.error = getString(R.string.text_empty)
@@ -201,7 +206,7 @@ class AddUpdateOfficeActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (isEdit) {
             menuInflater.inflate(R.menu.menu_office, menu)
         }

@@ -2,6 +2,7 @@ package com.farouqannajaby.olsera.ui.home.adapter
 
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,17 +47,16 @@ class OfficeAdapter : RecyclerView.Adapter<OfficeAdapter.OfficeViewHolder>() {
                 if (position % 2 == 0){
                     containerItem.setBackgroundColor(Color.GRAY)
                 }
-                tvNameAndCity.text = office.title + office.city
+                val nameCity = office.title+" "+office.city
+                tvNameAndCity.text = nameCity
                 if (office.status.equals("1")){
                     tvStatus.visibility = View.GONE
                 }else{
                     tvActive.visibility = View.GONE
                 }
-                binding.btnArrow.setOnClickListener {
+                binding.containerItem.setOnClickListener {
                     val intent = Intent(it.context, AddUpdateOfficeActivity::class.java)
                     intent.putExtra(AddUpdateOfficeActivity.EXTRA_OFFICE, office)
-                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_LATITUDE, office)
-                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_LONGTITUDE, office)
                     it.context.startActivity(intent)
                 }
             }

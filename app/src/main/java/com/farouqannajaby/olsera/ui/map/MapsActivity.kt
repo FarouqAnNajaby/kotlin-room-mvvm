@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -15,6 +16,9 @@ import androidx.core.content.ContextCompat
 import com.farouqannajaby.olsera.R
 import com.farouqannajaby.olsera.databinding.ActivityMapsBinding
 import com.farouqannajaby.olsera.ui.home.insert.AddUpdateOfficeActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -32,6 +36,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var long : String = ""
     private var address : String = ""
     private val TAG = "MapsActivity"
+
+    private var currentLocation : Location? = null
+    private var fusedLocationProviderClient: FusedLocationProviderClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +68,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.addMarker(
                 MarkerOptions()
                     .position(latLng)
-                    .title("New Marker")
+                    .title("Lokasi Anda")
                     .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
 
@@ -143,10 +150,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             e.printStackTrace()
         }
         return postal
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
