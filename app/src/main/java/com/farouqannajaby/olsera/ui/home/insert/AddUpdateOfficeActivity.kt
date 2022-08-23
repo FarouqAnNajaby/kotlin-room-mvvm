@@ -1,8 +1,12 @@
 package com.farouqannajaby.olsera.ui.home.insert
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,6 +16,7 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.farouqannajaby.olsera.R
 import com.farouqannajaby.olsera.database.Office
@@ -19,11 +24,23 @@ import com.farouqannajaby.olsera.databinding.ActivityAddUpdateOfficeBinding
 import com.farouqannajaby.olsera.helper.ViewModelFactory
 import com.farouqannajaby.olsera.ui.home.HomeActivity
 import com.farouqannajaby.olsera.ui.map.MapsActivity
+import com.farouqannajaby.olsera.utils.Constanta.ALERT_DIALOG_CLOSE
+import com.farouqannajaby.olsera.utils.Constanta.ALERT_DIALOG_DELETE
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_ADDRESS
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_CITY
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_LATITUDE
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_LONGTITUDE
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_POSTAL
+import com.farouqannajaby.olsera.utils.Constanta.EXTRA_TITLE
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import java.io.IOException
+import java.util.*
 
 class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -31,19 +48,12 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         const val EXTRA_OFFICE = "extra_office"
-        const val EXTRA_LONGTITUDE = "extra_longtitude"
-        const val EXTRA_LATITUDE = "extra_latitude"
-        const val EXTRA_ADDRESS = "extra_address"
-        const val EXTRA_CITY = "extra_city"
-        const val EXTRA_TITLE = "extra_title"
-        const val EXTRA_POSTAL = "extra_postal"
-        const val ALERT_DIALOG_CLOSE = 10
-        const val ALERT_DIALOG_DELETE = 20
-        const val TAG = "addupdate"
-        const val SIZE_MARKER = 40
     }
 
-    private lateinit var mMap: GoogleMap
+    private var currentLocation : Location? = null
+    private var fusedLocationProviderClient: FusedLocationProviderClient? = null
+    private val REQUEST_CODE = 101
+
     private var isEdit = false
     private var status: String = "0"
     private var office: Office? = null
@@ -60,9 +70,9 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityAddUpdateOfficeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this@AddUpdateOfficeActivity)
+
+        fetchLocation()
 
         officeAddUpdateViewModel = obtainViewModel(this@AddUpdateOfficeActivity)
 
@@ -94,9 +104,6 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.etAlamat.setText(office.alamat)
                     binding.etKode.setText(office.zipcode)
                     binding.etCity.setText(office.city)
-//                    lat = office.latitude.toString()
-                    Log.i(TAG, "lat: ${office.latitude}")
-//                    long = office.longtitude.toString()
                 }
             }
 
@@ -218,6 +225,25 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun fetchLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
+            return
+        }
+
+        val task = fusedLocationProviderClient!!.lastLocation
+        task.addOnSuccessListener { location ->
+            if (location != null){
+                currentLocation = location
+                val supportMapFragment = (supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)
+                supportMapFragment!!.getMapAsync(this@AddUpdateOfficeActivity)
+            }
+        }
+    }
+
     private fun toMaps(){
         val intent = Intent(this@AddUpdateOfficeActivity, MapsActivity::class.java)
         startActivity(intent)
@@ -297,70 +323,87 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        val latLng = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
+        val markerOptions = MarkerOptions().position(latLng).title("Your Location")
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15f))
+        googleMap.addMarker(markerOptions)
 
-        mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.uiSettings.isIndoorLevelPickerEnabled = true
-        mMap.uiSettings.isCompassEnabled = true
-        mMap.uiSettings.isMapToolbarEnabled = true
+        binding.etCity.setText(getCity(currentLocation!!.latitude, currentLocation!!.longitude))
+        binding.etAlamat.setText(getAddressName(currentLocation!!.latitude, currentLocation!!.longitude))
+        binding.etKode.setText(getPostalCode(currentLocation!!.latitude, currentLocation!!.longitude))
 
-        mMap.setOnMapLongClickListener { latLng ->
-            mMap.addMarker(
+        googleMap.setOnMapLongClickListener { latLng ->
+            googleMap.addMarker(
                 MarkerOptions()
                     .position(latLng)
                     .title("Lokasi Anda")
                     .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.img_location))
+                    .flat(true)
 
             )
             lat = latLng.latitude.toString()
             long = latLng.longitude.toString()
+
+            binding.etCity.setText(getCity(lat.toDouble(),long.toDouble()))
+            binding.etAlamat.setText(getAddressName(lat.toDouble(),long.toDouble()))
+            binding.etKode.setText(getPostalCode(lat.toDouble(),long.toDouble()))
         }
-
-        googleMap.setOnMapClickListener { point ->
-            Toast.makeText(
-                this,
-                point.latitude.toString() + ", " + point.longitude,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-
-        mLoadMaps()
-
     }
 
-    private fun mLoadMaps() {
-        val height: Int = SIZE_MARKER
-        val width: Int = SIZE_MARKER
-        val bitmapdraw = resources.getDrawable(R.drawable.img_location) as BitmapDrawable
-        val b = bitmapdraw.bitmap
-        val smallMarker = Bitmap.createScaledBitmap(
-            b,
-            bitmapdraw.bitmap.width * width / 100,
-            bitmapdraw.bitmap.height * height / 100,
-            false
-        )
-        mMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(lat.toDouble(), long.toDouble()))
-                .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                .title("Lokasi Anda")
-        )
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat.toDouble(), long.toDouble()), 10f))
-        val cameraPosition = CameraPosition.Builder()
-            .target(LatLng(lat.toDouble(), long.toDouble())) // Sets the center of the map to location user
-            .zoom(16f) // Sets the zoom
-            .bearing(0f) // Sets the orientation of the camera to east
-            .tilt(0f) // Sets the tilt of the camera to 30 degrees
-            .build() // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-        val circle = mMap.addCircle(
-            CircleOptions()
-                .center(LatLng(lat.toDouble(), long.toDouble()))
-                .radius(60.0)
-                .strokeWidth(3f)
-        )
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode){
+            REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    fetchLocation()
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    private fun getAddressName(lat: Double, lon: Double): String? {
+        var addressName: String? = null
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                addressName = list[0].getAddressLine(0)
+                Log.d("cekName", "getAddressName: $addressName")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return addressName
+    }
+
+    private fun getCity(lat: Double, lon: Double): String? {
+        var city: String? = null
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                city = list[0].subAdminArea
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return city
+    }
+
+    private fun getPostalCode(lat: Double, lon: Double): String? {
+        var postal: String? = null
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try {
+            val list = geocoder.getFromLocation(lat, lon, 1)
+            if (list != null && list.size != 0) {
+                postal = list[0].postalCode
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return postal
+    }
+
 }

@@ -7,10 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.farouqannajaby.olsera.databinding.FragmentAllStatusBinding
 import com.farouqannajaby.olsera.helper.ViewModelFactory
 import com.farouqannajaby.olsera.ui.home.adapter.OfficeAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AllStatusFragment : Fragment() {
 
@@ -34,9 +37,29 @@ class AllStatusFragment : Fragment() {
         val index = arguments?.getInt(ARG_SECTION_NUMBER, 0)
         homeViewModel = obtainViewModel(context as AppCompatActivity)
 
-        homeViewModel.getAllOffice().observe(viewLifecycleOwner) { officeList ->
-            if (officeList != null) {
-                adapter.setListOffice(officeList)
+        lifecycleScope.launch(Dispatchers.Main){
+            when (index) {
+                1 -> {
+                    homeViewModel.getAllOffice().observe(viewLifecycleOwner) { officeList ->
+                        if (officeList != null) {
+                            adapter.setListOffice(officeList)
+                        }
+                    }
+                }
+                2 -> {
+                    homeViewModel.getOfficeByStatus("1")?.observe(viewLifecycleOwner) { officeList ->
+                        if (officeList != null) {
+                            adapter.setListOffice(officeList)
+                        }
+                    }
+                }
+                else -> {
+                    homeViewModel.getOfficeByStatus("0")?.observe(viewLifecycleOwner) { officeList ->
+                        if (officeList != null) {
+                            adapter.setListOffice(officeList)
+                        }
+                    }
+                }
             }
         }
 

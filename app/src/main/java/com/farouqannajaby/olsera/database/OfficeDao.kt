@@ -17,7 +17,7 @@ interface OfficeDao {
     @Query("SELECT * FROM office")
     fun getAllOffice() : LiveData<List<Office>>
 
-//    @Query("SELECT EXISTS(SELECT * FROM office where status = :_status)")
-//    suspend fun getOffice(_status: String) : List<Office>
+    @Query("SELECT * FROM office WHERE status = (:status)")
+    fun getOfficebyStatus(status: String?) : LiveData<List<Office>>
 
 }

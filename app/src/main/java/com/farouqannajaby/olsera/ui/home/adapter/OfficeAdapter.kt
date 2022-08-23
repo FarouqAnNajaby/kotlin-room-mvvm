@@ -47,7 +47,7 @@ class OfficeAdapter : RecyclerView.Adapter<OfficeAdapter.OfficeViewHolder>() {
                 if (position % 2 == 0){
                     containerItem.setBackgroundColor(Color.GRAY)
                 }
-                val nameCity = office.latitude+" "+office.city
+                val nameCity = office.title+" "+office.city
                 tvNameAndCity.text = nameCity
                 if (office.status.equals("1")){
                     tvStatus.visibility = View.GONE
@@ -57,10 +57,6 @@ class OfficeAdapter : RecyclerView.Adapter<OfficeAdapter.OfficeViewHolder>() {
                 binding.containerItem.setOnClickListener {
                     val intent = Intent(it.context, AddUpdateOfficeActivity::class.java)
                     intent.putExtra(AddUpdateOfficeActivity.EXTRA_OFFICE, office)
-//                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_CITY, office.city)
-//                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_TITLE, office.title)
-//                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_ADDRESS, office.alamat)
-//                    intent.putExtra(AddUpdateOfficeActivity.EXTRA_POSTAL, office.zipcode)
                     Log.i("adapter", "bind: ${office.latitude}")
                     it.context.startActivity(intent)
                 }

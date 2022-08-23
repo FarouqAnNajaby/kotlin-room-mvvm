@@ -148,16 +148,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             onBackPressed()
-            val intent = Intent(this@MapsActivity, AddUpdateOfficeActivity::class.java)
-            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LATITUDE, lat)
-            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LONGTITUDE, long)
-            intent.putExtra(AddUpdateOfficeActivity.EXTRA_ADDRESS,
-                getAddressName(lat.toDouble(),long.toDouble()))
-            intent.putExtra(AddUpdateOfficeActivity.EXTRA_CITY,
-                getCity(lat.toDouble(),long.toDouble()))
-            intent.putExtra(AddUpdateOfficeActivity.EXTRA_POSTAL,
-                getPostalCode(lat.toDouble(),long.toDouble()))
-            startActivity(intent)
+//            val intent = Intent(this@MapsActivity, AddUpdateOfficeActivity::class.java)
+//            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LATITUDE, lat)
+//            intent.putExtra(AddUpdateOfficeActivity.EXTRA_LONGTITUDE, long)
+//            intent.putExtra(AddUpdateOfficeActivity.EXTRA_ADDRESS,
+//                getAddressName(lat.toDouble(),long.toDouble()))
+//            intent.putExtra(AddUpdateOfficeActivity.EXTRA_CITY,
+//                getCity(lat.toDouble(),long.toDouble()))
+//            intent.putExtra(AddUpdateOfficeActivity.EXTRA_POSTAL,
+//                getPostalCode(lat.toDouble(),long.toDouble()))
+//            startActivity(intent)
         }
         return super.onOptionsItemSelected(item)
     }

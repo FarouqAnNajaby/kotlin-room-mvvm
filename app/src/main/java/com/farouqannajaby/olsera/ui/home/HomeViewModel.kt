@@ -10,5 +10,9 @@ class HomeViewModel(application: Application) : ViewModel() {
 
     private val officeRepository: OfficeRepository = OfficeRepository(application)
 
-    fun getAllOffice(): LiveData<List<Office>> = officeRepository.getAllNotes()
+    fun getAllOffice(): LiveData<List<Office>> = officeRepository.getAllOffice()
+
+    fun getOfficeByStatus(status: String?): LiveData<List<Office>>? =
+        status?.let { officeRepository.getOfficebyStatus(it) }
+
 }

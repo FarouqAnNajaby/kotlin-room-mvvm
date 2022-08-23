@@ -18,7 +18,7 @@ class OfficeRepository(application: Application) {
         val db = OfficeDB.getDatabase(application)
         officeDao = db.officeDao()
     }
-    fun getAllNotes(): LiveData<List<Office>> = officeDao.getAllOffice()
+    fun getAllOffice(): LiveData<List<Office>> = officeDao.getAllOffice()
 
     fun insert(office: Office) {
         executorService.execute { officeDao.addOffice(office) }
@@ -30,4 +30,5 @@ class OfficeRepository(application: Application) {
         executorService.execute { officeDao.updateOffice(office) }
     }
 
+    fun getOfficebyStatus(status: String): LiveData<List<Office>> = officeDao.getOfficebyStatus(status)
 }
