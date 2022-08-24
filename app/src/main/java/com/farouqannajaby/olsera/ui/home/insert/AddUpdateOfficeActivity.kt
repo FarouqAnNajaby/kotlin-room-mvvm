@@ -1,10 +1,11 @@
 package com.farouqannajaby.olsera.ui.home.insert
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -104,6 +105,11 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.etAlamat.setText(office.alamat)
                     binding.etKode.setText(office.zipcode)
                     binding.etCity.setText(office.city)
+                    if (office.status.equals("1")){
+                        binding.radioActive.isChecked = true
+                    }else{
+                        binding.radioInactive.isChecked = true
+                    }
                 }
             }
 
@@ -324,7 +330,13 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         val latLng = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
-        val markerOptions = MarkerOptions().position(latLng).title("Your Location")
+        val markerOptions = MarkerOptions()
+                            .position(latLng)
+                            .title("Lokasi Anda")
+                            .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
+                            .icon(BitmapDescriptorFactory.fromBitmap(generateSmallIcon(this@AddUpdateOfficeActivity)))
+                            .flat(true)
+
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15f))
         googleMap.addMarker(markerOptions)
@@ -334,12 +346,13 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.etKode.setText(getPostalCode(currentLocation!!.latitude, currentLocation!!.longitude))
 
         googleMap.setOnMapLongClickListener { latLng ->
+            googleMap.clear()
             googleMap.addMarker(
                 MarkerOptions()
                     .position(latLng)
                     .title("Lokasi Anda")
                     .snippet("Lat: ${latLng.latitude} Long: ${latLng.longitude}")
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.img_location))
+                    .icon(BitmapDescriptorFactory.fromBitmap(generateSmallIcon(this@AddUpdateOfficeActivity)))
                     .flat(true)
 
             )
@@ -404,6 +417,13 @@ class AddUpdateOfficeActivity : AppCompatActivity(), OnMapReadyCallback {
             e.printStackTrace()
         }
         return postal
+    }
+
+    fun generateSmallIcon(context: Context): Bitmap {
+        val height = 100
+        val width = 100
+        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.img_location)
+        return Bitmap.createScaledBitmap(bitmap, width, height, false)
     }
 
 }
